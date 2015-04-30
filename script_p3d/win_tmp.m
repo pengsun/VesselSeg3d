@@ -2,12 +2,12 @@ function win_tmp ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_root  = 'D:\data\defactoSeg2';
-dir_mo    = fullfile(dir_root,'mo_zoo','p3d');
+dir_mo    = fullfile(dir_root,'mo_zoo','tmp_p3d');
 
 h = create_dag_from_scratch ();
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 300;
+h.num_epoch = 10;
 batch_sz    = 256;
 dir_data    = fullfile(dir_root, 'data', '20M');
 
@@ -33,7 +33,7 @@ diary off;
 
 function h = create_dag_from_scratch ()
 h = dag_mb();
-h.the_dag = tfw_seg();
+h.the_dag = tfw_p3d();
 h = init_params(h);
 h = init_opt(h);
 
@@ -69,5 +69,10 @@ for i = 1 : numel(rr)
 end
 
 function tr_bdg = load_tr_data(dir_data, bs)
-matIds = 1 : 100;
-tr_bdg = bdg_matInDir(dir_data, matIds, bs);
+nm = '01-001-MAP';
+mha = mha_read_volume(...
+  fullfile(dir_data, nm, 't.mha') );
+mk_fgbg = mha_read_volume(...
+  fullfile(dir_data, nm, 'maskfgbg.mha') );
+
+tr_bdg = bdg_matInDir(mha, mk_fgbg, bs,  @get_x_cubic32, @get_y_cen1 );

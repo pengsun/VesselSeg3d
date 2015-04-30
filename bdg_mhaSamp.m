@@ -1,5 +1,5 @@
 classdef bdg_mhaSamp < bdg_i
-  %BDG_MHASAMP bdg_mhaSamp, producing mini-batch by in-place sampling 
+  %BDG_MHASAMP producing mini-batch by in-place sampling 
   %   Pass the handle to get_x and get_y
   %   Set function handles for how to get instances x and labels y
   %
@@ -23,26 +23,18 @@ classdef bdg_mhaSamp < bdg_i
 
     hb; % handle to a  bat_gentor
   end
-  
-  properties % to restore
-    xMean; % [48, 48, 3] int16 mean image
-    vmax;  % [1] int16 max value
-    vmin;  % [1] int16 min value
-  end
-  
+   
   methods % implement the bdg_i interfaces
-    function ob = bdg_mhaSamp (mha, mk_fg, mk_bg, bs, h_get_x, h_get_y)
+    function ob = bdg_mhaSamp (mha, mk_fgbg, bs, h_get_x, h_get_y)
+    % ob = bdg_mhaSamp (mha, mk_fgbg, bs, h_get_x, h_get_y)
+    
       % checking
       assert( all(size(mha)==size(mk_fg)) );
-      assert( all(size(mk_fg)==size(mk_bg)) );
+      assert( all(size(mk_fg)==size(mk_fgbg)) );
       
-      % restore the main CT volume
+      % save the main CT volume and the internal mask
       ob.mha = mha;
-      
-      % construct the internal mask
-      ob.mk_fgbg = mk_fg;
-      itmp = (mk_bg==255);
-      ob.mk_fgbg(itmp) = 128;
+      ob.mk_fgbg = mk_fgbg;
       
       % create internal batch generator
       ob.ix_fgbg = find(ob.mk_fgbg > 0);
@@ -50,10 +42,10 @@ classdef bdg_mhaSamp < bdg_i
       ob.hb = bat_gentor();
       ob.hb = reset(ob.hb, N,bs);
       
-      % how to get instances x and labels y
+      % function handles: how to get instances x and labels y?
       ob.h_get_x = h_get_x;
       ob.h_get_y = h_get_y;
-    end % bdg_mha2
+    end % bdg_mhaSamp
     
     function ob = reset_epoch(ob)
     % reset for a new epoch
@@ -98,8 +90,7 @@ classdef bdg_mhaSamp < bdg_i
       ind_fgbg = ob.ix_fgbg(idx);
       
       % the instaces: X
-      X = ob.h_get_x(ob.mha, ind_fgbg);
-      data{1} = restore_X(ob, X);
+      data{1} = ob.h_get_x(ob.mha, ind_fgbg);
       % the labels: Y
       data{2} = ob.h_get_y(ob.mk_fgbg, ind_fgbg);
     end
@@ -108,22 +99,6 @@ classdef bdg_mhaSamp < bdg_i
       Ygt = ob.h_get_y(ob.mk_fgbg, ob.ix_fgbg);
     end
     
-    function xx = restore_X (ob, x)
-      % uint8 to float
-      xx = single(x);
-      
-      % do nothing further if unset
-      if ( isempty(ob.xMean) || isempty(ob.vmin) || isempty(ob.vmax) )
-        return;
-      end
-      
-      % to 0 mean, approximately [-1, +1]
-      xx = bsxfun(@minus, xx, ob.xMean);
-      ix = (xx > 0);
-      xx(ix)  = xx(ix) ./ abs(ob.vmax);
-      xx(~ix) = xx(~ix) ./ abs(ob.vmin); 
-    end % restore_X
-    
   end % auxiliary 
   
-end % bdg_mha2
+end % bdg_mhaSamp

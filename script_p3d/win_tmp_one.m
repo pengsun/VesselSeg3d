@@ -1,32 +1,30 @@
-function win_tmp ()
+function win_tmp_one ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
-dir_root  = fileparts( fileparts( mfilename('fullpath') ) );
-dir_mo    = fullfile(dir_root,'mo_zoo','tmp_p3d');
+dir_this  = fileparts( fileparts( mfilename('fullpath') ) );
+dir_mo    = fullfile(dir_this,'mo_zoo','tmp_p3d');
 
 h = create_dag_from_scratch ();
 h = set_dataNormLayer (h);
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 16;
+h.num_epoch = 10;
 batch_sz    = 256;
-ni_perMha   = 8e3;
+ni_perMha   = 4e4;
 
 %% CPU or GPU
 % h.the_dag = to_cpu( h.the_dag );
 h.the_dag = to_gpu( h.the_dag );
 %% peek and do something (printing, plotting, saving, etc)
 hpeek = peek();
-
 % plot training loss
-addlistener(h, 'end_ep', @hpeek.plot_loss);
-
+% addlistener(h, 'end_ep', @hpeek.plot_loss);
 % save model
 hpeek.dir_mo = dir_mo;
 addlistener(h, 'end_ep', @hpeek.save_mo);
 %% initialize the batch data generator
-tr_bdg = load_tr_data(dir_data, ni_perMha, batch_sz);
+tr_bdg = load_tr_data(dir_data, batch_sz, ni_perMha);
 %% do the training
 diary( [mfilename, '.txt'] );
 diary on;
@@ -80,13 +78,18 @@ K = 32;
 h.the_dag.tfs{1}.v_mean = zeros(K,K,K, 'single');
 h.the_dag.tfs{1}.v_std  = ones(K,K,K, 'single');
 
-function tr_bdg = load_tr_data(dir_data, ni_perMha, bs)
+function tr_bdg = load_tr_data(dir_data, bs, ni_perMha)
+nm = '01-001-MAP';
 
-% load the info file and make the names list
-st = load( fullfile(dir_data, 'info_small.mat') );
-names = st.imgNames(st.imgSetId==1); % 1 indicates training data
-names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
-  names, 'UniformOutput', false); 
+fprintf('reading volumes...');
+t_elap = tic; % ---------------------------
+mha = mha_read_volume(...
+  fullfile(dir_data, nm, 't.mha') );
+mk_fgbg = mha_read_volume(...
+  fullfile(dir_data, nm, 'maskfgbg.mha') );
+t_elap = toc(t_elap); % -------------------
+fprintf('done. Time spent: %4.3f\n', t_elap);
 
-tr_bdg = bdg_mhaDefacto2(names, ni_perMha, bs, ...
-  @get_x_cubic32, @get_y_cen1, @bdg_mhaSampBal);
+tr_bdg = bdg_mhaSampBal(...
+  mha, mk_fgbg, floor(ni_perMha/2), bs,...
+  @get_x_cubic32, @get_y_cen1 );

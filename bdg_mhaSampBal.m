@@ -13,9 +13,12 @@ classdef bdg_mhaSampBal < bdg_i
   %
   
   properties
-    mha;     % [a,b,c] the 3d CT volume
-    mk_fgbg; % [a,b,c] the mask:
-             % 255: vessels, 128: background, 0: not interested
+    %mha;     % [a,b,c] the 3d CT volume
+    %mk_fgbg; % [a,b,c] the mask:
+    %         % 255: vessels, 128: background, 0: not interested
+    
+    X;
+    Y;
     ix_fgbg; % [M] # fg+bg pixels index
     
     h_get_x; % handle to how to get instances x
@@ -25,30 +28,30 @@ classdef bdg_mhaSampBal < bdg_i
   end
    
   methods % implement the bdg_i interfaces
-    function ob = bdg_mhaSampBal (mha, mk_fgbg, bs, h_get_x, h_get_y)
-    % ob = bdg_mhaSamp (mha, mk_fgbg, bs, h_get_x, h_get_y)
+    function ob = bdg_mhaSampBal (mha, mk_fgbg, MM, bs, h_get_x, h_get_y)
+    % ob = bdg_mhaSamp (mha, mk_fgbg, bs, MM, h_get_x, h_get_y)
+    % MM: [1]. #fg = #bg = M
     
       % checking
-      assert( all(size(mha)==size(mk_fg)) );
-      assert( all(size(mk_fg)==size(mk_fgbg)) );
+      assert( all( size(mha)==size(mk_fgbg) ) );
+      assert( 2*MM >= bs );
       
-      % save the main CT volume and the internal mask
-      ob.mha = mha;
-      ob.mk_fgbg = mk_fgbg;
+      fprintf('bdg_mhaSampBal: sampling for current mha...');
+      t_elap = tic; %------------------------------------------------------
       
       % balanced sampling. TODO: better implementation?
-      ix_fg = find(mk_fgbg == 255);
-      ix_bg = find(mk_fgbg == 128);
-      num_fg = numel(ix_fg);
-      num_bg = numel(ix_bg);
-      if (num_bg >= num_fg) % sample without replacement
-        ix_bgb = ix_bg( randsample(num_bg, num_fg) ); 
-      else
-        ix_bgb = ix_bg( randsample(num_bg, num_fg, false) ); 
-      end
+      ix_fg    = find(mk_fgbg == 255);
+      num_fg   = numel(ix_fg);
+      rep_flag = (num_fg < MM);
+      ix_fgb   = ix_fg( randsample(num_fg, MM, rep_flag) );
+      
+      ix_bg    = find(mk_fgbg == 128);
+      num_bg   = numel(ix_bg);
+      rep_flag = (num_bg < MM);
+      ix_bgb   = ix_bg( randsample(num_bg, MM, rep_flag) );
       
       % create internal batch generator
-      ob.ix_fgbg = [ix_fg; ix_bgb];
+      ob.ix_fgbg = [ix_fgb; ix_bgb];
       N = numel(ob.ix_fgbg);
       ob.hb = bat_gentor();
       ob.hb = reset(ob.hb, N,bs);
@@ -56,6 +59,12 @@ classdef bdg_mhaSampBal < bdg_i
       % function handles: how to get instances x and labels y?
       ob.h_get_x = h_get_x;
       ob.h_get_y = h_get_y;
+      % 
+      ob.X = ob.h_get_x(mha,     ob.ix_fgbg);
+      ob.Y = ob.h_get_y(mk_fgbg, ob.ix_fgbg);
+      
+      t_elap = toc(t_elap); %----------------------------------------------
+      fprintf('done. Time spent %4.3f\n', t_elap);
     end % bdg_mhaSamp
     
     function ob = reset_epoch(ob)
@@ -97,14 +106,21 @@ classdef bdg_mhaSampBal < bdg_i
   
   methods % auxiliary, extra interfaces
     function data = get_bd_from_idx (ob, idx)
-      % the fg, bg mask index: should never be out of boundary
-      ind_fgbg = ob.ix_fgbg(idx);
-      
       % the instaces: X
-      data{1} = ob.h_get_x(ob.mha, ind_fgbg);
+      data{1} = ob.X(:,:,:, idx);
       % the labels: Y
-      data{2} = ob.h_get_y(ob.mk_fgbg, ind_fgbg);
+      data{2} = ob.Y(:, idx);
     end
+    
+%     function data = get_bd_from_idx (ob, idx)
+%       % the fg, bg mask index: should never be out of boundary
+%       ind_fgbg = ob.ix_fgbg(idx);
+%       
+%       % the instaces: X
+%       data{1} = ob.h_get_x(ob.mha, ind_fgbg);
+%       % the labels: Y
+%       data{2} = ob.h_get_y(ob.mk_fgbg, ind_fgbg);
+%     end
     
     function Ygt = get_all_Ygt (ob)
       Ygt = ob.h_get_y(ob.mk_fgbg, ob.ix_fgbg);

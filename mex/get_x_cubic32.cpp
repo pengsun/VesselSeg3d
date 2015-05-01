@@ -18,7 +18,7 @@ void mexFunction(int no, mxArray       *vo[],
   
 
   ///// Create Output
-  int M = mxGetM(ind) * mxGetN(ind);
+  mwSize M = mxGetM(ind) * mxGetN(ind);
   mwSize dims[4] = {K,K,K,0};
   dims[3] = M;
   mxArray *X = mxCreateNumericArray(4, dims, mxSINGLE_CLASS, mxREAL);
@@ -36,22 +36,22 @@ void mexFunction(int no, mxArray       *vo[],
 
   // iterate over center points
   #pragma omp parallel for
-  for (int m = 0; m < M; ++m) {
+  for (int64_T m = 0; m < M; ++m) {
     // center index --> center point
-    int ixcen = int( *(p_ind + m) );
+    mwSize ixcen = int( *(p_ind + m) );
     ixcen -= 1; // Matlab 1 base -> C 0 base
-    int pntcen[3];
+    mwSize pntcen[3];
     ix_to_pnt3d(sz_img, ixcen, pntcen);
     
     // set the K x K x K cubic: iterate over dim_1, dim_2, dim_3
-    int stride_X = K*K*K*m;
-    float *pp = p_X + stride_X;
+    mwSize stride_x = K*K*K*m;
+    float *pp = p_X + stride_x; // stride
 
     for (int i = (-KK); i < KK; ++i) {
       for (int j = (-KK); j < KK; ++j) {
         for (int k = (-KK); k < KK; ++k) {
           // the working offset
-          int d[3]; 
+          mwSize d[3]; 
           d[0] = i; d[1] = j; d[2] = k;
           // value on the image
           float val; 
@@ -63,9 +63,6 @@ void mexFunction(int no, mxArray       *vo[],
     } // for k
 
   } // for m
-
-
-
 
   return;
 }

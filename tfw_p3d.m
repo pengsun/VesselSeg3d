@@ -18,57 +18,33 @@ classdef tfw_p3d < tfw_i
       tfs{ell} = tf_norm_ms();
       
       % -- layer I
-      % 1: conv, param
-      tfs{ell+1}      = tf_conv();
-      tfs{ell+1}.i    = tfs{ell}.o;
-      tfs{ell+1}.p(2) = n_data();
-      % 2: pool
-      tfs{ell+2}   = tf_pool();
-      tfs{ell+2}.i = tfs{1}.o;
-      
+      ell = ell + 1;
+      tfs{ell}   = tfw_ConvReluPoolDrop();
+      tfs{ell}.i = tfs{ell-1}.o;
+
       % -- layer II
-      % 3: conv, param
-      tfs{ell+3}      = tf_conv();
-      tfs{ell+3}.i    = tfs{2}.o;
-      tfs{ell+3}.p(2) = n_data();
-      % 4: pool
-      tfs{ell+4}   = tf_pool();
-      tfs{ell+4}.i = tfs{3}.o;
+      ell = ell + 1;
+      tfs{ell}   = tfw_ConvReluPoolDrop();
+      tfs{ell}.i = tfs{ell-1}.o;
       
       % -- layer III
-      % 5: conv, param
-      tfs{ell+5}      = tf_conv();
-      tfs{ell+5}.i    = tfs{4}.o;
-      tfs{ell+5}.p(2) = n_data();
-      % 6: pool
-      tfs{ell+6}   = tf_pool();
-      tfs{ell+6}.i = tfs{5}.o;
+      ell = ell + 1;
+      tfs{ell}   = tfw_ConvReluPoolDrop();
+      tfs{ell}.i = tfs{ell-1}.o;
       
-      % -- layer IV, 1x1 conv
-      % 7: conv, param
-      tfs{ell+7}      = tf_conv();
-      tfs{ell+7}.i    = tfs{6}.o;
-      tfs{ell+7}.p(2) = n_data();
-      % 8: relu
-      tfs{ell+8}   = tf_relu();
-      tfs{ell+8}.i = tfs{7}.o;
-      % 9: dropout
-      tfs{ell+9}   = tf_dropout();
-      tfs{ell+9}.i = tfs{8}.o;
-      
-      % -- layer V, output
-      % 10: full connection, param
-      tfs{ell+10}      = tf_conv();
-      tfs{ell+10}.i    = tfs{9}.o;
-      tfs{ell+10}.p(2) = n_data();
-      % 11: loss
-      tfs{ell+11}      = tf_loss_lse();
-      tfs{ell+11}.i(1) = tfs{10}.o;
+      % -- layer IV, output
+      ell = ell + 1;
+      tfs{ell}   = tf_conv();
+      tfs{ell}.i = tfs{ell-1}.o;
+      % loss
+      ell = ell + 1;
+      tfs{ell}      = tf_loss_lse();
+      tfs{ell}.i(1) = tfs{ell-1}.o;
       
       % write back
       ob.tfs = tfs;      
       
-      
+
       %%% input/output data
       ob.i = [n_data(), n_data()]; % X_bat, Y_bat, respectively
       ob.o = n_data();             % the loss
@@ -81,9 +57,8 @@ classdef tfw_p3d < tfw_i
     
     function ob = fprop(ob)
        %%% Outer Input --> Internal Input
-       ell = 1;
-       ob.tfs{ell+1}.i.a     = ob.ab.cvt_data( ob.i(1).a ); % bat_X
-       ob.tfs{ell+11}.i(2).a = ob.ab.cvt_data( ob.i(2).a ); % bat_Y
+       ob.tfs{1}.i.a      = ob.ab.cvt_data( ob.i(1).a ); % bat_X
+       ob.tfs{end}.i(2).a = ob.ab.cvt_data( ob.i(2).a ); % bat_Y
        
        %%% fprop for all
        for i = 1 : numel( ob.tfs )
@@ -105,8 +80,8 @@ classdef tfw_p3d < tfw_i
       end
       % tfs{1} is the normalization tf, skip it
       
-      %%% Internal Input --> Outer Input: just the input 1, the image
-      ob.i(1).d = ob.tfs{1}.i.d; % bat_X
+      % %%% Internal Input --> Outer Input: just the input 1, the image
+      % ob.i(1).d = ob.tfs{1}.i.d; % bat_X
     end % bprop
     
     % helper

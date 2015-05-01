@@ -12,5 +12,5 @@ function yy = get_y_cen1(mk, ind)
   
   % scalr to vector response
   yy = zeros(1, M, 'single');
-  yy(2, v==255) = 1; % fore ground
-  %yy(1, v==128) = 0; % back ground
+  yy(v==255) = 1; % fore ground
+  %yy(v==128) = 0; % back ground

@@ -1,5 +1,5 @@
-classdef bdg_mhaSamp < bdg_i
-  %BDG_MHASAMP producing mini-batch by in-place sampling 
+classdef bdg_mhaSampBal < bdg_i
+  %BDG_MHASAMPBAL producing mini-batch by in-place balanced sampling 
   %   Pass the handle to get_x and get_y
   %   Set function handles for how to get instances x and labels y
   %
@@ -9,7 +9,7 @@ classdef bdg_mhaSamp < bdg_i
   %   X: [32,32,32,N], ndims(X) = 4
   %   The lables are 0/1 mask for the pre-specified points in the cube
   %   Y: [K,N], each clumn is 1-hot response for the fg; Or 0/1 bg/fg 
-  %      coding when K = 1; 
+  %      coding when K = 1; bg, fg are balanced
   %
   
   properties
@@ -25,7 +25,7 @@ classdef bdg_mhaSamp < bdg_i
   end
    
   methods % implement the bdg_i interfaces
-    function ob = bdg_mhaSamp (mha, mk_fgbg, bs, h_get_x, h_get_y)
+    function ob = bdg_mhaSampBal (mha, mk_fgbg, bs, h_get_x, h_get_y)
     % ob = bdg_mhaSamp (mha, mk_fgbg, bs, h_get_x, h_get_y)
     
       % checking
@@ -36,11 +36,22 @@ classdef bdg_mhaSamp < bdg_i
       ob.mha = mha;
       ob.mk_fgbg = mk_fgbg;
       
+      % balanced sampling. TODO: better implementation?
+      ix_fg = find(mk_fgbg == 255);
+      ix_bg = find(mk_fgbg == 128);
+      num_fg = numel(ix_fg);
+      num_bg = numel(ix_bg);
+      if (num_bg >= num_fg) % sample without replacement
+        ix_bgb = ix_bg( randsample(num_bg, num_fg) ); 
+      else
+        ix_bgb = ix_bg( randsample(num_bg, num_fg, false) ); 
+      end
+      
       % create internal batch generator
-      ob.ix_fgbg = find( mk_fgbg > 0 );
+      ob.ix_fgbg = [ix_fg; ix_bgb];
       N = numel(ob.ix_fgbg);
       ob.hb = bat_gentor();
-      ob.hb = reset(ob.hb, N, bs);
+      ob.hb = reset(ob.hb, N,bs);
       
       % function handles: how to get instances x and labels y?
       ob.h_get_x = h_get_x;
@@ -101,4 +112,4 @@ classdef bdg_mhaSamp < bdg_i
     
   end % auxiliary 
   
-end % bdg_mhaSamp
+end % bdg_mhaSampBal

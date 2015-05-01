@@ -112,7 +112,7 @@ classdef tfw_p3d < tfw_i
     % helper
     function Ypre = get_Ypre(ob)
       Ypre = ob.tfs{end-1}.o.a;
-    end % get_pre
+    end % get_Ypre
   end % methods
   
 end % tfw_p3d

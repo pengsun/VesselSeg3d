@@ -1,0 +1,71 @@
+#include "mex.h"
+#include "util3d.hpp"
+#include <omp.h>
+
+static const int K  = 32;
+static const int KK = K/2;
+
+//  X = get_x_cubic32(img, ind);
+//  img: [a,b,c]. int16. The CT volume
+//  ind: [M]. double. Linear index to the image for the locations of sampling points
+//  X: [K,K,K, M]. single. The cubic data batch
+void mexFunction(int no, mxArray       *vo[],
+                 int ni, mxArray const *vi[])
+{
+  //// Get Input
+  mxArray const *img  = vi[0];
+  mxArray const *ind = vi[1];
+  
+
+  ///// Create Output
+  int M = mxGetM(ind) * mxGetN(ind);
+  mwSize dims[4] = {K,K,K,0};
+  dims[3] = M;
+  mxArray *X = mxCreateNumericArray(4, dims, mxSINGLE_CLASS, mxREAL);
+  // set the output
+  vo[0] = X;
+
+
+  //// do the job
+  int16_T *p_img = (int16_T*) mxGetData(img);
+  const mwSize *sz_img;
+  sz_img = mxGetDimensions(img);
+
+  double *p_ind = (double*) mxGetData(ind);
+  float  *p_X  = (float*) mxGetData(X); 
+
+  // iterate over center points
+  #pragma omp parallel for
+  for (int m = 0; m < M; ++m) {
+    // center index --> center point
+    int ixcen = int( *(p_ind + m) );
+    ixcen -= 1; // Matlab 1 base -> C 0 base
+    int pntcen[3];
+    ix_to_pnt3d(sz_img, ixcen, pntcen);
+    
+    // set the K x K x K cubic: iterate over dim_1, dim_2, dim_3
+    int stride_X = K*K*K*m;
+    float *pp = p_X + stride_X;
+
+    for (int i = (-KK); i < KK; ++i) {
+      for (int j = (-KK); j < KK; ++j) {
+        for (int k = (-KK); k < KK; ++k) {
+          // the working offset
+          int d[3]; 
+          d[0] = i; d[1] = j; d[2] = k;
+          // value on the image
+          float val; 
+          get_val_from_offset(p_img, sz_img, pntcen, d,  val);
+          // write back
+          *pp = val; ++pp;
+        } // for i
+      } // for j
+    } // for k
+
+  } // for m
+
+
+
+
+  return;
+}

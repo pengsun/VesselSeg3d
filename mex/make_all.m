@@ -17,4 +17,5 @@ switch str(1:3)
 end
 %% do it
 % mex(opt{:}, 'get_x_cubic32.cpp');
-mex(opt{:}, 'load_mhaAsync.cpp', 'mha_reader_mt.cpp');
+mex(opt{:}, 'get_x_slice32c15.cpp');
+% mex(opt{:}, 'load_mhaAsync.cpp', 'mha_reader_mt.cpp');

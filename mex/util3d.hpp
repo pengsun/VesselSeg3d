@@ -2,8 +2,9 @@
 #define util3d_h__
 
 #include "tmwtypes.h"
+#include <cstring>
 
-//// for debugging output
+//// debugging output
 #ifdef VB
   #define LOGMSG mexPrintf
 #else
@@ -11,6 +12,36 @@
 #endif // VB
 
 
+//// type conversion
+inline int get_elemsz(mxClassID cid) {
+  switch (cid) {
+  case mxUINT8_CLASS: return 1;
+    break;
+  case mxINT16_CLASS: return 2;
+    break;
+  case mxSINGLE_CLASS: return 4;
+    break;
+  default:
+    mexErrMsgTxt("mha_reader_mt: unsupported mha element type\n");
+  }
+}
+
+inline mxClassID get_cidFromMhaStr (const char * str) {
+  if ( 0 == strcmp(str,"MET_UCHAR") ) 
+    return mxUINT8_CLASS;
+
+  if ( 0 == strcmp(str,"MET_SHORT") ) 
+    return mxINT16_CLASS;
+
+  if ( 0 == strcmp(str,"MET_FLOAT") ) 
+    return mxSINGLE_CLASS;
+
+  return mxUNKNOWN_CLASS;
+
+}
+
+
+//// 3D geometry
 inline void ix_to_pnt3d (const mwSize sz[], mwSize ix, mwSize pnt[])
 {
   pnt[2] = ix / (sz[0]*sz[1]);

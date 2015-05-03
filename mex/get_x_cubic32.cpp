@@ -2,8 +2,8 @@
 #include "util3d.hpp"
 #include <omp.h>
 
-static const int K  = 32;
-static const int KK = K/2;
+static const int S  = 32;
+static const int SS = S/2;
 
 //  X = get_x_cubic32(img, ind);
 //  img: [a,b,c]. int16. The CT volume
@@ -19,7 +19,7 @@ void mexFunction(int no, mxArray       *vo[],
 
   ///// Create Output
   mwSize M = mxGetM(ind) * mxGetN(ind);
-  mwSize dims[4] = {K,K,K,0};
+  mwSize dims[4] = {S,S,S,0};
   dims[3] = M;
   mxArray *X = mxCreateNumericArray(4, dims, mxSINGLE_CLASS, mxREAL);
   // set the output
@@ -44,12 +44,12 @@ void mexFunction(int no, mxArray       *vo[],
     ix_to_pnt3d(sz_img, ixcen, pntcen);
     
     // set the K x K x K cubic: iterate over dim_1, dim_2, dim_3
-    mwSize stride_x = K*K*K*m;
+    mwSize stride_x = S*S*S*m;
     float *pp = p_X + stride_x; // stride
 
-    for (int i = (-KK); i < KK; ++i) {
-      for (int j = (-KK); j < KK; ++j) {
-        for (int k = (-KK); k < KK; ++k) {
+    for (int i = (-SS); i < SS; ++i) {
+      for (int j = (-SS); j < SS; ++j) {
+        for (int k = (-SS); k < SS; ++k) {
           // the working offset
           mwSize d[3]; 
           d[0] = i; d[1] = j; d[2] = k;

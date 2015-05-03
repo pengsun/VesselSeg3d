@@ -3,6 +3,14 @@
 
 #include "tmwtypes.h"
 
+//// for debugging output
+#ifdef VB
+  #define LOGMSG mexPrintf
+#else
+  #define LOGMSG(...)
+#endif // VB
+
+
 inline void ix_to_pnt3d (const mwSize sz[], mwSize ix, mwSize pnt[])
 {
   pnt[2] = ix / (sz[0]*sz[1]);

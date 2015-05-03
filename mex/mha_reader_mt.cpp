@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstring>
 
+#include "util3d.hpp"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ int get_elemsz(mxClassID cid) {
   switch (cid) {
   case mxUINT8_CLASS: return 1;
     break;
-  case mxUINT16_CLASS: return 2;
+  case mxINT16_CLASS: return 2;
     break;
   case mxSINGLE_CLASS: return 4;
     break;
@@ -24,11 +25,11 @@ int get_elemsz(mxClassID cid) {
 }
 
 mxClassID get_cidFromMhaStr (const char * str) {
-  if ( 0 == strcmp(str,"MET_SHORT") ) 
-    return mxINT16_CLASS;
-
   if ( 0 == strcmp(str,"MET_UCHAR") ) 
     return mxUINT8_CLASS;
+
+  if ( 0 == strcmp(str,"MET_SHORT") ) 
+    return mxINT16_CLASS;
 
   if ( 0 == strcmp(str,"MET_FLOAT") ) 
     return mxSINGLE_CLASS;
@@ -54,6 +55,13 @@ void mha_read_meta (ifstream& is,
     char left[512], right[512];
     sscanf(line.c_str(), "%s = %s", left, right);
 
+    LOGMSG( line.c_str() );
+    LOGMSG( "\n" );
+
+    LOGMSG("tellg() = ");
+    LOGMSG( to_string( (int)is.tellg() ).c_str() );
+    LOGMSG( "\n" );
+
     // check and set
 
     if ( 0 == strcmp(left, "ObjectType") ) { // must be an image
@@ -62,7 +70,7 @@ void mha_read_meta (ifstream& is,
     }
 
     if ( 0 == strcmp(left, "NDims") ) { // must be 3 dimensional
-      if ( 0 == strcmp(right, "3") )
+      if ( 0 != strcmp(right, "3") )
         break; // unsupported
     }
 
@@ -73,7 +81,7 @@ void mha_read_meta (ifstream& is,
 
     if ( 0 == strcmp(left, "DimSize") ) { // e.g., DimSize = 512 512 368
       int xdim, ydim, zdim;
-      sscanf(right, "%d %d %d", xdim,ydim,zdim);
+      sscanf(line.c_str(), "DimSize = %d %d %d", &xdim, &ydim, &zdim);
       mm.sz[0] = xdim;
       mm.sz[1] = ydim;
       mm.sz[2] = zdim;
@@ -121,14 +129,14 @@ void mha_reader_mt::read(const VecStr& fns)
 {
   kill_tasks();
   
-  thread td{&mha_reader_mt::run_tasks, fns};
+  thread td(&mha_reader_mt::run_tasks, this, fns);
   worker = std::move(td);
 }
 
 int mha_reader_mt::get_numbuf()
 {
   wait_tasks();
-  lock_guard lock(mtx);
+  lock_guard<mutex> lock(mtx);
 
   return tasks.size();
 }
@@ -136,14 +144,14 @@ int mha_reader_mt::get_numbuf()
 void mha_reader_mt::get_meta(int i_buf, mha_meta& mm)
 {
   wait_tasks();
-  lock_guard lock(mtx);
+  lock_guard<mutex> lock(mtx);
   mm = tasks[i_buf].mm;
 }
 
 void mha_reader_mt::get_mem(int i_buf, char* &buf)
 {
   wait_tasks();
-  lock_guard lock(mtx);
+  lock_guard<mutex> lock(mtx);
   buf = &(tasks[i_buf].buf[0]);
 }
 
@@ -166,7 +174,7 @@ void mha_reader_mt::kill_tasks()
 
 void mha_reader_mt::run_tasks( const VecStr& fns )
 {
-  lock_guard lock(mtx);
+  lock_guard<mutex> lock(mtx);
 
   tasks.resize(fns.size());
   for (int i = 0; i < tasks.size(); ++i) {
@@ -180,7 +188,7 @@ void mha_reader_mt::run_tasks( const VecStr& fns )
 void mha_reader_mt::task::run()
 {
   // open as text: parse header text
-  ifstream is(this->fn);
+  ifstream is(this->fn, ios::binary);
   if (!is.is_open()) {
     this->st = ERROR;
     return;

@@ -1,6 +1,7 @@
-classdef bdg_mhaDefacto2 < bdg_i
-  %bdg_mhaDefacto2 Generate data from mha files in directory. A wrapper 
-  %   Detailed explanation goes here
+classdef bdg_mhaDefacto2Async < bdg_i
+  %bdg_mhaDefacto2 Generate data asynchronously from mha files in 
+  %directory. A wrapper 
+  %   Call mex file load_mhaAsync for internal asynchronous mha reading
   
   properties
     dir_names; % 
@@ -16,7 +17,8 @@ classdef bdg_mhaDefacto2 < bdg_i
   end
   
   methods % implement the bdg_i interfaces
-    function ob = bdg_mhaDefacto2(dir_names, M, bs, h_getx, h_gety, class_bdg)
+    function ob = bdg_mhaDefacto2Async(dir_names, M, bs,...
+                                       h_getx, h_gety, class_bdg)
       % check
       assert(M >= bs);
       
@@ -34,7 +36,7 @@ classdef bdg_mhaDefacto2 < bdg_i
     end % bdg_mhaInDir
     
     function ob = reset_epoch(ob)
-      ob       = switch_toNextMha(ob);
+      ob       = switch_toCurrentMha(ob);
       ob.h_bdg = reset_epoch(ob.h_bdg);
     end
     
@@ -61,7 +63,7 @@ classdef bdg_mhaDefacto2 < bdg_i
   end % methods
   
   methods % auxiliary
-    function ob = switch_toNextMha (ob)
+    function ob = switch_toCurrentMha (ob)
       
       while (true)
         try
@@ -71,25 +73,28 @@ classdef bdg_mhaDefacto2 < bdg_i
             ob = init_superEpoch (ob);        % begin another "super" epoch
           end
           
-          i_mha  = ob.mha_id( ob.i_cnt );
-          cur_nm = ob.dir_names{i_mha};
-          fprintf('moving to mha %d: %s...',...
-            i_mha, cur_nm );
-
-          % load the mha
-          t_elap = tic; %--------------------------------------------------
-          mha     = mha_read_volume( fullfile(cur_nm, 't.mha') );
-          mk_fgbg = mha_read_volume( fullfile(cur_nm, 'maskfgbg.mha') );
-          t_elap = toc(t_elap); %------------------------------------------
+          % fetch data
+          if (ob.i_cnt == 1) % begining of super epoch, prefetch mannually
+            ob = prefetch(ob, ob.i_cnt);
+          end        
+          [mha, mk_fgbg] = fetch(ob);
+          
+          % prefetch data
+          if (ob.i_cnt <= numel(ob.dir_names) )
+            i_next = ob.i_cnt + 1;
+            ob = prefetch(ob, i_next);
+          end
+ 
         catch
-          fprintf('error, skip this\n');
+          etmpl = 'error while processing mha count %d: %s, skip this\n'; 
+          i_mha = ob.mha_id(ob.i_cnt);
+          fprintf(etmpl,  i_mha, ob.dir_names{i_mha} );
           continue;
         end
         
-        % done, leave
-        fprintf('done. Time spent %4.3f\n', t_elap);
-        break;
-      end
+        % leave if no error
+        break; 
+      end % while true
       
       % set the bdg
       clear ob.h_bdg;
@@ -103,6 +108,30 @@ classdef bdg_mhaDefacto2 < bdg_i
       ob.mha_id = randperm( numel(ob.dir_names) );
       fprintf('new mha order: %d\n', ob.mha_id);
     end
+    
+    function ob = prefetch(ob, cnt) 
+      i_mha  = ob.mha_id( cnt ); % let it raise an error if too big cnt
+      cur_nm = ob.dir_names{i_mha};
+      fprintf('begin prefetching mha count %d: %s...\n',...
+        i_mha, cur_nm );
+      
+      fn_mha      = fullfile(cur_nm, 't.mha');
+      fn_maskfgbg = fullfile(cur_nm, 'maskfgbg.mha');
+      load_mhaAsync(fn_mha, fn_maskfgbg);
+    end
+    
+    function [mha,mk_fgbg] = fetch(ob)
+      t_elap = tic; %------------------------------------------------------
+      [mha, mk_fgbg] = load_mhaAsync();
+      t_elap = toc(t_elap); %----------------------------------------------
+      
+      % done, print fetched mha info
+      i_mha  = ob.mha_id( ob.i_cnt ); 
+      cur_nm = ob.dir_names{i_mha};
+      fprintf('fetching mha count %d: %s...', i_mha, cur_nm);
+      fprintf('Done. Time spent %4.3f\n', t_elap);
+    end
+    
   end % methods 
   
 end % bdg_mhaDefacto2

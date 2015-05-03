@@ -1,5 +1,4 @@
 #include "mha_reader_mt.h"
-#include "mc_types.h"
 #include "mex.h"
 #include <algorithm>
 
@@ -10,11 +9,13 @@ using namespace std;
 namespace {
 void get_fns (int ni, mxArray const *vi[],  VecStr& fns)
 {
+  fns.clear();
+
   char* str;
   for (int i = 0; i < ni; ++i) {
     str = mxArrayToString( vi[i] );
     if (str == 0) mexErrMsgTxt("load_mhaAsync: input must be string\n");
-    fns[i] = string(str);
+    fns.push_back( string(str) );
     mxFree(str);
   }
 }

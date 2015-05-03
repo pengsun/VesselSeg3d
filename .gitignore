@@ -1,1 +1,6 @@
 *.asv
+*.mat
+*.mexw64
+*.mha
+*.pdb
+*.txt

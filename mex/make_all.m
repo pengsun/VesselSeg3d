@@ -1,6 +1,7 @@
 %% config
 opt = {};
 % opt{end+1} = '-g';
+% opt{end+1} = '-DVB';
 opt{end+1} = '-v';
 opt{end+1} = '-largeArrayDims';
 % opt{end+1} = '-DVB';
@@ -15,7 +16,5 @@ switch str(1:3)
     opt{end+1} = 'LDFLAGS="\$LDFLAGS -fopenmp -std=c++11"';
 end
 %% do it
-% mex(opt{:}, 'load_xy_async.cpp');
-mex(opt{:}, 'get_x_cubic32.cpp');
-% mex(opt{:}, 'get_y_cen1.cpp');
-% mex(opt{:}, 'toy.cpp');
+% mex(opt{:}, 'get_x_cubic32.cpp');
+mex(opt{:}, 'load_mhaAsync.cpp', 'mha_reader_mt.cpp');

@@ -111,17 +111,7 @@ classdef bdg_mhaSampBal < bdg_i
       % the labels: Y
       data{2} = ob.Y(:, idx);
     end
-    
-%     function data = get_bd_from_idx (ob, idx)
-%       % the fg, bg mask index: should never be out of boundary
-%       ind_fgbg = ob.ix_fgbg(idx);
-%       
-%       % the instaces: X
-%       data{1} = ob.h_get_x(ob.mha, ind_fgbg);
-%       % the labels: Y
-%       data{2} = ob.h_get_y(ob.mk_fgbg, ind_fgbg);
-%     end
-    
+        
     function Ygt = get_all_Ygt (ob)
       Ygt = ob.h_get_y(ob.mk_fgbg, ob.ix_fgbg);
     end

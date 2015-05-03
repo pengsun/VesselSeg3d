@@ -1,4 +1,5 @@
 #include "mha_reader_mt.h"
+#include "util3d.hpp"
 #include "mex.h"
 #include <algorithm>
 
@@ -20,29 +21,28 @@ void get_fns (int ni, mxArray const *vi[],  VecStr& fns)
   }
 }
 
-
-void copy_buf (char* buf, mxClassID tp, mwSize NElem,  float* to)
-{
-  switch (tp) {
-    case mxUINT8_CLASS: {
-      uint8_T* p_from = (uint8_T*) buf;
-      copy(p_from, p_from+NElem, to);
-      break;
-    }
-    case mxINT16_CLASS: {
-      int16_T* p_from = (int16_T*) buf;
-      copy(p_from, p_from+NElem, to);
-      break;
-    }
-    case mxSINGLE_CLASS: {
-      float* p_from = (float*) buf;
-      copy(p_from, p_from+NElem, to);
-      break;
-    }
-    default:
-      mexErrMsgTxt("load_mhaAsync: unsupported mha element type\n");
-  }
-}
+//void copy_buf (char* buf, mxClassID tp, mwSize NElem,  float* to)
+//{
+//  switch (tp) {
+//    case mxUINT8_CLASS: {
+//      uint8_T* p_from = (uint8_T*) buf;
+//      copy(p_from, p_from+NElem, to);
+//      break;
+//    }
+//    case mxINT16_CLASS: {
+//      int16_T* p_from = (int16_T*) buf;
+//      copy(p_from, p_from+NElem, to);
+//      break;
+//    }
+//    case mxSINGLE_CLASS: {
+//      float* p_from = (float*) buf;
+//      copy(p_from, p_from+NElem, to);
+//      break;
+//    }
+//    default:
+//      mexErrMsgTxt("load_mhaAsync: unsupported mha element type\n");
+//  }
+//}
 
 } // namespace
 
@@ -70,16 +70,17 @@ void mexFunction(int no, mxArray       *vo[],
 
     // for each mha file set the output
     for (int i_buf = 0; i_buf < no; ++i_buf) {
-      // get the size and create an mxArray with the same size (always single)
+      // get the size and create an mxArray with the same size and type
       mha_meta mm;
       the_reader.get_meta(i_buf, mm);
-      mxArray* p_mha = mxCreateNumericArray(3, mm.sz, mxSINGLE_CLASS, mxREAL);
+      mxArray* p_mha = mxCreateNumericArray(3, mm.sz, mm.tp, mxREAL);
 
-      // get the buffer and copy data to the mxArray 
+      // get the buffer and copy data to the mxArray (byte by byte)
       char* buf;
       the_reader.get_mem(i_buf, buf);
-      mwSize NElem = mm.sz[0] * mm.sz[1] * mm.sz[2]; 
-      copy_buf(buf, mm.tp, NElem,  (float*)mxGetData(p_mha) );
+      mwSize NElem  = mm.sz[0] * mm.sz[1] * mm.sz[2]; 
+      mwSize NBytes = NElem * get_elemsz(mm.tp);
+      std::copy(buf, buf + NBytes,  (char*)mxGetData(p_mha) );
       
       // write back to the output
       vo[i_buf] = p_mha;

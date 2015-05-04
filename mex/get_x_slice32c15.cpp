@@ -5,7 +5,7 @@
 namespace {
 
 const int SS = 16;   // half the size
-const int S  = 2*S;  // slice size
+const int S  = 2*SS; // slice size
 const int CC = 5;    // #channels per plane
 const int C  = 3*CC; // #channels in total (for the 3 perpendicular planes)
 const int CHANNNEL_OFFSET_TMPL[CC] = {-14, -7, 0, 7, 14}; // channel position (offset) template
@@ -40,7 +40,7 @@ void mexFunction(int no, mxArray       *vo[],
   float  *p_X  = (float*) mxGetData(X); 
 
   // iterate over center points
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for (int64_T m = 0; m < M; ++m) {
     // center index --> center point
     mwSize ixcen = mwSize( *(p_ind + m) );
@@ -48,69 +48,67 @@ void mexFunction(int no, mxArray       *vo[],
     mwSize pntcen[3];
     ix_to_pnt3d(sz_img, ixcen, pntcen);
     
-    // manually set the S x S x C planes
-    { // dim_1, dim_2 planes, CC in total
+    { // dim_1, dim_2, dim_3 (CC planes): inner to outer
       mwSize stride_X = 0 + S*S*C*m; 
       float *pp = p_X + stride_X;
 
-      for (int i = (-SS); i < SS; ++i) { 
+      for (int k = 0; k < CC; ++k) {
         for (int j = (-SS); j < SS; ++j) {
-          for (int k = 0; k < CC; ++k) {
+          for (int i = (-SS); i < SS; ++i) { 
             // the working offset
-            mwSize d[3]; 
+            int d[3]; 
             d[0] = i; d[1] = j; d[2] = CHANNNEL_OFFSET_TMPL[k];
             // value on the image
             float val; 
             get_val_from_offset(p_img, sz_img, pntcen, d,  val);
             // write back
             *pp = val; ++pp;
-          } // for k
+          } // for i
         } // for j
-      } // for i
+      } // for k
     }
 
-    { // dim_2, dim_3
+    { // dim_2, dim_3, dim_1(CC planes): inner to outer
       mwSize stride_X = 1*S*S*CC + S*S*C*m; 
       float *pp = p_X + stride_X;
 
       for (int i = 0; i < CC; ++i) {
-        for (int j = (-SS); j < SS; ++j) {
-          for (int k = (-SS); k < SS; ++k) {
+        for (int k = (-SS); k < SS; ++k) {
+          for (int j = (-SS); j < SS; ++j) {
             // the working offset
-            mwSize d[3];
+            int d[3];
             d[0] = CHANNNEL_OFFSET_TMPL[i]; d[1] = j; d[2] = k;
             // value on the image
             float val;
             get_val_from_offset(p_img, sz_img, pntcen, d, val);
             // write back
             *pp = val; ++pp;
-          } // for k
-        } // for j
+          } // for j
+        } // for k
       } // for i
     }
 
-    { // dim_1, dim_3
+    { // dim_1, dim_3, dim_2(CC planes): inner to outer
       int stride = 2*S*S*CC + S*S*C*m;
       float *pp = p_X + stride;
 
-      for (int i = (-SS); i < SS; ++i) {
-        for (int j = 0; j < CC; ++j) {
-          for (int k = (-SS); k < SS; ++k) {
+      for (int j = 0; j < CC; ++j) {
+        for (int k = (-SS); k < SS; ++k) {
+          for (int i = (-SS); i < SS; ++i) {
             // the working offset
-            mwSize d[3];
+            int d[3];
             d[0] = i; d[1] = CHANNNEL_OFFSET_TMPL[j]; d[2] = k;
             // value on the image
             float val;
             get_val_from_offset(p_img, sz_img, pntcen, d, val);
             // write back
             *pp = val; ++pp;
-          } // for k
-        } // for j
-      } // for i
+          } // for i
+        } // for k
+      } // for j
     }
 
   } // for m
-
 
   return;
 }

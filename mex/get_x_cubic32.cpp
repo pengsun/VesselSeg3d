@@ -51,7 +51,7 @@ void mexFunction(int no, mxArray       *vo[],
       for (int j = (-SS); j < SS; ++j) {
         for (int k = (-SS); k < SS; ++k) {
           // the working offset
-          mwSize d[3]; 
+          int d[3]; 
           d[0] = i; d[1] = j; d[2] = k;
           // value on the image
           float val; 

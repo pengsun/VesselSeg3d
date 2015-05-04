@@ -1,18 +1,17 @@
-function win_aio ()
-%% use asynchronous mha loader
+function win_tmp ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
-dir_root  = fileparts( fileparts( mfilename('fullpath') ) );
-dir_mo    = fullfile(dir_root,'mo_zoo','tmp_p3d_aio');
+dir_root  = rootdir;
+dir_mo    = fullfile(dir_root,'mo_zoo','tmp_p3d');
 
 h = create_dag_from_scratch ();
 h = set_dataNormLayer (h, dir_root);
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 1000;
+h.num_epoch = 80;
 batch_sz    = 256;
-ni_perMha   = 2e4;
+ni_perMha   = 8e3;
 
 %% CPU or GPU
 % h.the_dag = to_cpu( h.the_dag );
@@ -81,11 +80,10 @@ h.the_dag.tfs{1}.v_std  = st.v_std;
 
 function tr_bdg = load_tr_data(dir_data, ni_perMha, bs)
 % load the info file and make the names list
-st = load( fullfile(dir_data, 'info_small.mat') );
+st = load( fullfile(dir_data, 'info_med.mat') );
 names = st.imgNames(st.imgSetId==1); % 1 indicates training data
 names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
   names, 'UniformOutput', false); 
 
-tr_bdg = bdg_mhaDefacto2Async(...
-  names, ni_perMha, bs, ...
+tr_bdg = bdg_mhaDefacto2(names, ni_perMha, bs, ...
   @get_x_cubic32, @get_y_cen1, @bdg_mhaSampBal);

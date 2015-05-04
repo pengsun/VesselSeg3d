@@ -80,7 +80,7 @@ classdef bdg_mhaDefacto2Async < bdg_i
           [mha, mk_fgbg] = fetch(ob);
           
           % prefetch data
-          if (ob.i_cnt <= numel(ob.dir_names) )
+          if (ob.i_cnt <= numel(ob.dir_names) ) % don't need it if the last
             i_next = ob.i_cnt + 1;
             ob = prefetch(ob, i_next);
           end

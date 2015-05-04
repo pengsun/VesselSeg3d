@@ -1,6 +1,7 @@
 %% mean and std for slice32c15
 %% config
-dir_data = '/home/ubuntu/A/data/defactoSeg2';
+% dir_data = '/home/ubuntu/A/data/defactoSeg2';
+dir_data = 'D:\data\defactoSeg2';
 ni_perMha = 2e4;
 bs = 1024;
 TT = 200 * 1;

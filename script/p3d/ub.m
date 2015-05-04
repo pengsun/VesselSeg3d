@@ -2,7 +2,7 @@ function ub ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = '/home/ubuntu/A/data/defactoSeg2';
-dir_root  = fileparts( fileparts( mfilename('fullpath') ) );
+dir_root  = rootdir();
 dir_mo    = fullfile(dir_root,'mo_zoo','p3d');
 
 h = create_dag_from_scratch ();

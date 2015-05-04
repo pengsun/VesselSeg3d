@@ -3,17 +3,15 @@ function win_aio ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
-dir_root  = fileparts( fileparts( mfilename('fullpath') ) );
-dir_mo    = fullfile(dir_root,'mo_zoo','tmp_slice32c15');
+dir_mo    = fullfile(rootdir(),'mo_zoo','tmp_slice32c15');
 
 h = create_dag_from_scratch ();
-h = set_dataNormLayer (h, dir_root);
+h = set_dataNormLayer (h);
 %% config
 h.beg_epoch = beg_epoch;
 h.num_epoch = 1000;
 batch_sz    = 256;
 ni_perMha   = 2e4;
-
 %% CPU or GPU
 % h.the_dag = to_cpu( h.the_dag );
 h.the_dag = to_gpu( h.the_dag );
@@ -74,8 +72,8 @@ for i = 1 : numel(rr)
   h.opt_arr( 2*(i-1) + 2 ).eta = rr(i);
 end
 
-function h = set_dataNormLayer(h, dir_root)
-st = load( fullfile(dir_root, 'data_cache', 'slice32c15_ms.mat') );
+function h = set_dataNormLayer(h)
+st = load( fullfile(rootdir(), 'data_cache', 'slice32c15_ms.mat') );
 h.the_dag.tfs{1}.v_mean = st.v_mean;
 h.the_dag.tfs{1}.v_std  = st.v_std;
 

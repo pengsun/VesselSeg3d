@@ -2,7 +2,7 @@ function win_tmp_one ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
-dir_this  = fileparts( fileparts( mfilename('fullpath') ) );
+dir_this  = rootdir();
 dir_mo    = fullfile(dir_this,'mo_zoo','tmp_p3d');
 
 h = create_dag_from_scratch ();

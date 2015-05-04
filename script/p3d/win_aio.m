@@ -3,7 +3,7 @@ function win_aio ()
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
-dir_root  = fileparts( fileparts( mfilename('fullpath') ) );
+dir_root  = rootdir();
 dir_mo    = fullfile(dir_root,'mo_zoo','tmp_p3d_aio');
 
 h = create_dag_from_scratch ();

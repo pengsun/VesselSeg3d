@@ -1,5 +1,5 @@
 %%
-dir_data = 'D:\data\defactoSeg2';
+dir_data = '/home/ubuntu/A/data/defactoSeg2';
 %%
 fns = dir( dir_data );
 

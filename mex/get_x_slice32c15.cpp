@@ -40,7 +40,7 @@ void mexFunction(int no, mxArray       *vo[],
   float  *p_X  = (float*) mxGetData(X); 
 
   // iterate over center points
-  //#pragma omp parallel for
+  #pragma omp parallel for
   for (int64_T m = 0; m < M; ++m) {
     // center index --> center point
     mwSize ixcen = mwSize( *(p_ind + m) );

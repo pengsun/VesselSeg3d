@@ -5,11 +5,13 @@ T         = 36;  % T epoches, T == #te
 
 dir_data = 'D:\data\defactoSeg2';
 
-% fnout   = 'te_cubic32.mat'; % te data file name
-% h_get_x = @get_x_cubic32;   % handle to how to get X 
+% sz      = [32,32,15];
+% fnout   = 'te_slice32c15.mat'; % te data file name
+% h_get_x = @get_x_slice32c15;   % handle to how to get X 
 
-fnout   = 'te_slice32c15.mat'; % te data file name
-h_get_x = @get_x_slice32c15;   % handle to how to get X 
+sz      = [48,48,15];
+fnout   = 'te_slice48c15.mat'; % te data file name
+h_get_x = @get_x_slice48c15;   % handle to how to get X 
 
 rng(42,'twister'); % ensure repeatability
 %% init the batch data generator
@@ -21,8 +23,8 @@ names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
 te_bdg = bdg_mhaDefacto2(names, ni_perMha, bs, ...
   h_get_x, @get_y_cen1, @bdg_mhaSampBal);
 %% collect data
-X = zeros(32,32,15,0, 'single');
-Y = zeros(1, 0, 'single');
+X = zeros([sz(1),sz(2),sz(3),0], 'single');
+Y = zeros([1, 0], 'single');
 
 diary( [fnout,'.txt'] );
 diary on;

@@ -2,9 +2,14 @@
 %% config
 % dir_data = '/home/ubuntu/A/data/defactoSeg2';
 dir_data = 'D:\data\defactoSeg2';
+fnout = 'slice48c15_ms.mat';
+
 ni_perMha = 2e4;
-bs = 1024;
-TT = 200 * 1;
+bs        = 1024;
+TT        = 200 * 1;
+
+sz      = [48,48,15];
+h_get_x = @get_x_slice48c15;
 %%
 st = load( fullfile(dir_data, 'info.mat') );
 names = st.imgNames(st.imgSetId==1); % 1 indicates training data
@@ -12,11 +17,11 @@ names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
   names, 'UniformOutput', false); 
 
 h = bdg_mhaDefacto2(names, ni_perMha, bs, ...
-  @get_x_slice32c15, @get_y_cen1, @bdg_mhaSampBal);
+  h_get_x, @get_y_cen1, @bdg_mhaSampBal);
 
 rng(624, 'twister');
 %%
-sz = [32,32,15];
+
 v_mean = zeros(sz, 'single' );
 v_std  = zeros(sz, 'single' );
 cnt = 0;
@@ -39,4 +44,4 @@ for t = 1 : TT
   end
 end
 %% 
-save('slice32c15_ms.mat', 'v_mean','v_std');
+save(fnout, 'v_mean','v_std');

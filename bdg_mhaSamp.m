@@ -1,5 +1,6 @@
 classdef bdg_mhaSamp < bdg_i
-  %bdg_mhaSamp producing mini-batch by in-place sampling 
+  %bdg_mhaSamp producing mini-batch by sampling 
+  %   Sample all data and put them in RAM. 
   %   Pass the handle to get_x and get_y
   %   Set function handles for how to get instances x and labels y
   %

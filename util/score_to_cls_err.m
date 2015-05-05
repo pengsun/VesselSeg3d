@@ -5,8 +5,8 @@ function [err, err_one, err_two] = score_to_cls_err(Ypre, Y)
 
 % the error
 th = 0.5;
-label_pre = (Ypre > th);
-label     = (Y > th);
+label_pre = (Ypre >= th);
+label     = (Y >= th);
 N = numel(label);
 err = sum( label_pre ~= label ) / N;
 

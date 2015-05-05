@@ -3,12 +3,12 @@ function [err_ep, err] =  te_eps(varargin)
 % config 
 dir_root = fileparts( fileparts( mfilename('fullpath') ) );
 if ( nargin==0 )
-  ep = 1 : 100 : 1000;
+  ep = 1 : 500 : 6000;
   batch_sz = 512;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'p3d');
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'slice32c15');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
-  fn_data = fullfile(dir_root, 'data_cache','te_cubic32.mat');
+  fn_data = fullfile(dir_root, 'data_cache','te_slice32c15.mat');
   fn_mo_tmpl = 'ep_%d.mat';
 elseif ( nargin==5 )
   ep = varargin{1};

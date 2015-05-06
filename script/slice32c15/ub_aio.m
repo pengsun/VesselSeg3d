@@ -19,7 +19,7 @@ h.the_dag = to_gpu( h.the_dag );
 hpeek = peek();
 
 % plot training loss
-addlistener(h, 'end_ep', @hpeek.plot_loss);
+%addlistener(h, 'end_ep', @hpeek.plot_loss);
 
 % save model
 hpeek.dir_mo = dir_mo;

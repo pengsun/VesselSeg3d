@@ -9,7 +9,7 @@ h = create_dag_from_scratch ();
 h = set_dataNormLayer (h);
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 200 * 30;
+h.num_epoch = 200 * 50;
 batch_sz    = 256;
 ni_perMha   = 2e4;
 %% CPU or GPU
@@ -41,7 +41,7 @@ h = init_params(h);
 h = init_opt(h);
 
 function h = init_params(h)
-C  = 15; % #channels
+C  = 3; % #channels
 NH = 16; % #hidden units
 no = 1;  % output size
 f = 0.01;

@@ -5,10 +5,10 @@ dir_root = fileparts( fileparts( mfilename('fullpath') ) );
 if ( nargin==0 )
   ep = 1 : 200 : 10000;
   batch_sz = 512;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'slice32c3');
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
-  fn_data = fullfile(dir_root, 'data_cache','te_slice32c3.mat');
+  fn_data = fullfile(dir_root, 'data_cache','te_slice48c3.mat');
   fn_mo_tmpl = 'ep_%d.mat';
 elseif ( nargin==5 )
   ep = varargin{1};
@@ -48,7 +48,7 @@ for i = 1 : numel(ep)
   Ypre = gather(Ypre);
   
   % show the error
-  [err(1+i), err_bg(1+i), err_fg(1+i)] = score_to_cls_err(Ypre, te_bdg.Y);
+  [err(1+i), err_bg(1+i), err_fg(1+i)] = get_bin_cls_err(Ypre, te_bdg.Y);
   %
   err_ep = [err_ep, ep(i)];
   plot_err(hax, err_ep(2:end), err(2:end), 'ro-');

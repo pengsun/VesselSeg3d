@@ -43,7 +43,7 @@ h = init_opt(h);
 function h = init_params(h)
 C  = 3; % #channels
 NH = 16; % #hidden units
-no = 1;  % output size
+no = 2;  % output size
 f = 0.01;
 % parameter layer I, conv
 h.the_dag.p(1).a = f*randn(3,3,C,NH, 'single') ; % kernel
@@ -86,5 +86,5 @@ names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
 
 tr_bdg = bdg_mhaDefacto2Async(...
   names, ni_perMha, bs, ...
-  @get_x_slice48c3, @get_y_cen1, @bdg_mhaSampBal);
+  @get_x_slice48c3, @get_y_cen2, @bdg_mhaSampBal);
 

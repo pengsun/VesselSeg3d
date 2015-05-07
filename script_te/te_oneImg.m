@@ -6,14 +6,14 @@ function err =  te_oneImg(varargin)
 if (nargin==0) % config (as script)
   batch_sz = 1024;
   dir_mo = 'D:\CodeWork\git\VesselSeg3d\mo_zoo';
-  fn_mo = fullfile(dir_mo, '\slice32c3\ep_8801.mat');
+  fn_mo = fullfile(dir_mo, '\slice48c3\ep_9994.mat');
   % instances, labels...
   name     = '01-001-MAP';
   dir_name = fullfile('D:\data\defactoSeg2\', name);
   fn_mha   = fullfile(dir_name, 't.mha');          % the CT volume
   fn_fgbg  = fullfile(dir_name, 'maskfgbg.mha');   % the fg bg mask
   % handles
-  hgetx = @get_x_slice32c3;
+  hgetx = @get_x_slice48c3;
   hgety = @get_y_cen1;
   % output file name
   fn_out_s  = fullfile('.\', [name,'_pre_s.mha']);
@@ -61,7 +61,7 @@ Ypre = gather(Ypre);
 
 % show the error
 Ygt = get_all_Ygt(te_bdg);
-[err, err_one, err_two] = score_to_cls_err(Ypre, Ygt);
+[err, err_one, err_two] = get_bin_cls_err(Ypre, Ygt);
 fprintf('classification error = %0.3f\n', err );
 fprintf('background misclassfication rate = %0.3f\n', err_one );
 fprintf('foreground misclassfication rate = %0.3f\n', err_two );
@@ -74,7 +74,12 @@ end % te_oneImg
 
 function out = get_pre_score(Ypre, te_bdg)
   out = zeros(size(te_bdg.mk_fgbg), 'single');
-
-  s = Ypre;
+  
+  K = size(Ypre,1);
+  if (K==1)
+    s = Ypre;
+  else
+    s = Ypre(2,:) - Ypre(1,:);
+  end
   out( te_bdg.ix_fgbg ) = single( s(:) );
 end

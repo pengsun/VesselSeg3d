@@ -38,7 +38,6 @@ two_gt  = (Y >= th );
 a_two = sum( two_gt & two_pre ) ./ (sum(two_gt)+eps);
 err_two = 1 - a_two; 
 
-
 function [err, err_one, err_two] = vec_to_cls_err(Ypre, Y)
 % vector-valued prediction to binary classification error
 % Ypre: [K, N]

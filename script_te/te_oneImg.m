@@ -6,7 +6,7 @@ function err =  te_oneImg(varargin)
 if (nargin==0) % config (as script)
   batch_sz = 1024;
   dir_mo = 'D:\CodeWork\git\VesselSeg3d\mo_zoo';
-  fn_mo = fullfile(dir_mo, '\slice48c3\ep_9994.mat');
+  fn_mo = fullfile(dir_mo, '\slice48c3_cen2\ep_1441.mat');
   % instances, labels...
   name     = '01-001-MAP';
   dir_name = fullfile('D:\data\defactoSeg2\', name);
@@ -14,7 +14,7 @@ if (nargin==0) % config (as script)
   fn_fgbg  = fullfile(dir_name, 'maskfgbg.mha');   % the fg bg mask
   % handles
   hgetx = @get_x_slice48c3;
-  hgety = @get_y_cen1;
+  hgety = @get_y_cen2;
   % output file name
   fn_out_s  = fullfile('.\', [name,'_pre_s.mha']);
 else

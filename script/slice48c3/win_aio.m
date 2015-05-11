@@ -41,7 +41,7 @@ h = init_params(h);
 h = init_opt(h);
 
 function h = init_params(h)
-C  = 15; % #channels
+C  = 3; % #channels
 NH = 16; % #hidden units
 no = 1;  % output size
 f = 0.01;

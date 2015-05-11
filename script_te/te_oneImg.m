@@ -6,7 +6,7 @@ function err =  te_oneImg(varargin)
 if (nargin==0) % config (as script)
   batch_sz = 1024;
   dir_mo = 'D:\CodeWork\git\VesselSeg3d\mo_zoo';
-  fn_mo = fullfile(dir_mo, '\slice48c3_cen2\ep_1441.mat');
+  fn_mo = fullfile(dir_mo, '\slice48c3_cen2\ep_9601.mat');
   % instances, labels...
   name     = '01-001-MAP';
   dir_name = fullfile('D:\data\defactoSeg2\', name);

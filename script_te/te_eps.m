@@ -5,10 +5,10 @@ dir_root = fileparts( fileparts( mfilename('fullpath') ) );
 if ( nargin==0 )
   ep = 1 : 200 : 10000;
   batch_sz = 512;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3');
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3_cen2');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
-  fn_data = fullfile(dir_root, 'data_cache','te_slice48c3.mat');
+  fn_data = fullfile(dir_root, 'data_cache','te_slice48c3_cen2.mat');
   fn_mo_tmpl = 'ep_%d.mat';
 elseif ( nargin==5 )
   ep = varargin{1};

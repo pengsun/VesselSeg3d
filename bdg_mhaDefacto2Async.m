@@ -135,6 +135,3 @@ classdef bdg_mhaDefacto2Async < bdg_i
   end % methods 
   
 end % bdg_mhaDefacto2
-
-
-

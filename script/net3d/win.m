@@ -1,10 +1,10 @@
-function win_aio ()
+function win ()
 %% use asynchronous mha loader
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
 dir_root  = rootdir();
-dir_mo    = fullfile(dir_root,'mo_zoo','win_net3d_aio_f01');
+dir_mo    = fullfile(dir_root,'mo_zoo','win_net3d_f01');
 
 h = create_dag_from_scratch ();
 h = set_dataNormLayer (h, dir_root);
@@ -86,6 +86,6 @@ names = st.imgNames(st.imgSetId==1); % 1 indicates training data
 names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
   names, 'UniformOutput', false); 
 
-tr_bdg = bdg_mhaDefacto2Async(...
+tr_bdg = bdg_mhaDefacto2(...
   names, ni_perMha, bs, ...
   @get_x_cubic32, @get_y_cen1, @bdg_mhaSampBal);

@@ -1,18 +1,18 @@
-function win_aio ()
+function win ()
 %% use asynchronous mha loader
 %% init dag: from scratch
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
 dir_root  = rootdir();
-dir_mo    = fullfile(dir_root,'mo_zoo','win_net3d_aio_f01');
+dir_mo    = fullfile(dir_root,'mo_zoo','win_net3d2_nh16');
 
 h = create_dag_from_scratch ();
 h = set_dataNormLayer (h, dir_root);
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 1000;
+h.num_epoch = 200 * 30;
 batch_sz    = 64;
-ni_perMha   = 2e3;
+ni_perMha   = 2e4;
 
 %% CPU or GPU
 h.the_dag = to_cpu( h.the_dag );
@@ -38,12 +38,12 @@ diary off;
 
 function h = create_dag_from_scratch ()
 h = dag_mb();
-h.the_dag = tfw_net3d();
+h.the_dag = tfw_net3d2();
 h = init_params(h);
 h = init_opt(h);
 
 function h = init_params(h)
-NH = 8; % #hidden units
+NH = 16; % #hidden units
 no = 1;  % output size
 f = 0.1;
 % parameter layer I, conv
@@ -55,9 +55,12 @@ h.the_dag.p(4).a = zeros(1,NH,'single');
 % parameter layer III, conv
 h.the_dag.p(5).a = f*randn(2,2,2, NH,NH, 'single'); 
 h.the_dag.p(6).a = zeros(1,NH,'single');        
-% parameter layer IV, output
-h.the_dag.p(7).a = f*randn(3,3,3, NH,no, 'single'); 
-h.the_dag.p(8).a = zeros(1,no,'single'); 
+% parameter layer IV, conv 1x1x1
+h.the_dag.p(7).a = f*randn(1,1,1, NH,NH, 'single'); 
+h.the_dag.p(8).a = zeros(1,NH,'single'); 
+% parameter layer V, output (full connection)
+h.the_dag.p(9).a = f*randn(3,3,3, NH,no, 'single'); 
+h.the_dag.p(10).a = zeros(1,no,'single'); 
 
 function h = init_opt(h)
 num_params = numel(h.the_dag.p);
@@ -66,7 +69,7 @@ h.opt_arr(num_params) = opt_1storder();
 
 nr = floor(num_params/2);
 assert( nr == ceil(num_params/2) );
-% rr = [0.01, 0.005, 0.001, 0.001];
+% rr = [0.01, 0.005, 0.001, 0.001, 0.001];
 rr = 0.001 * ones(1, nr);
 for i = 1 : numel(rr)
   h.opt_arr( 2*(i-1) + 1 ).eta = rr(i);
@@ -86,6 +89,6 @@ names = st.imgNames(st.imgSetId==1); % 1 indicates training data
 names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
   names, 'UniformOutput', false); 
 
-tr_bdg = bdg_mhaDefacto2Async(...
+tr_bdg = bdg_mhaDefacto2(...
   names, ni_perMha, bs, ...
   @get_x_cubic32, @get_y_cen1, @bdg_mhaSampBal);

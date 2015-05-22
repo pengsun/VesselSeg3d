@@ -6,9 +6,9 @@ if ( nargin==0 )
 %   ep = 1 : 200 : 10000;
 %   batch_sz = 512;
 %   dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3_cen2');
-  ep = 1 : 3 : 11;
+  ep = 1000;
   batch_sz = 384;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'tmp_net3d_aio');
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'win_net3d_f01');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
   %fn_data = fullfile(dir_root, 'data_cache','te_slice48c3_cen2.mat');
@@ -23,7 +23,7 @@ elseif ( nargin==5 )
 else
   error('Invalid arguments.');
 end
-
+   
 % load data
 fprintf('loading %s...', fn_data);
 te_bdg = load_te_data_all(fn_data, batch_sz);

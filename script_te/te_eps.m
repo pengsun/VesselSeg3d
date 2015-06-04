@@ -6,9 +6,9 @@ if ( nargin==0 )
 %   ep = 1 : 200 : 10000;
 %   batch_sz = 512;
 %   dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3_cen2');
-  ep = 1000;
+  ep = 173;
   batch_sz = 384;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'win_net3d_f01');
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'win_net3d2_nh16');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
   %fn_data = fullfile(dir_root, 'data_cache','te_slice48c3_cen2.mat');

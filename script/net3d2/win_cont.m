@@ -1,7 +1,7 @@
 function win_cont ()
 %% use asynchronous mha loader
 %% init dag: from scratch
-beg_epoch = 47; 
+beg_epoch = 302; 
 dir_data  = 'D:\data\defactoSeg2';
 dir_root  = rootdir();
 dir_mo      = fullfile(dir_root,'mo_zoo','win_net3d2_nh16');
@@ -11,7 +11,7 @@ fn_mo = sprintf('ep_%d.mat', beg_epoch-1);
 h = create_dag_from_file ( fullfile(dir_mo_from, fn_mo) );
 %% config
 h.beg_epoch = beg_epoch;
-h.num_epoch = 200 * 50;
+h.num_epoch = 200 * 30;
 batch_sz    = 64;
 ni_perMha   = 2e4;
 

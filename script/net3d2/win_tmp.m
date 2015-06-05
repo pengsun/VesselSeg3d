@@ -11,7 +11,7 @@ h = set_dataNormLayer (h, dir_root);
 %% config
 h.beg_epoch = beg_epoch;
 h.num_epoch = 200 * 30;
-batch_sz    = 128;
+batch_sz    = 32;
 ni_perMha   = 2e4;
 
 %% CPU or GPU

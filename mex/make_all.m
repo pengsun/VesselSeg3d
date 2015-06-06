@@ -17,6 +17,7 @@ switch str(1:3)
     error('unsupported platform %s\n', str);
 end
 %% do it
+mex(opt{:}, 'get_x_cubic12.cpp');
 mex(opt{:}, 'get_x_cubic32.cpp');
 mex(opt{:}, 'get_x_slice32c3.cpp');
 mex(opt{:}, 'get_x_slice32c15.cpp');

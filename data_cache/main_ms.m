@@ -2,14 +2,19 @@
 %% config
 % dir_data = '/home/ubuntu/A/data/defactoSeg2';
 dir_data = 'D:\data\defactoSeg2';
-fnout = 'slice48c3_ms.mat';
 
 ni_perMha = 2e4;
 bs        = 1024;
 TT        = 200 * 1;
 
-sz      = [48,48,3];
-h_get_x = @get_x_slice48c3;
+% fnout = 'slice48c3_ms.mat';
+% sz      = [48,48,3];
+% h_get_x = @get_x_slice48c3;
+
+fnout = 'cubic12_ms.mat';
+sz      = [12,12,12];
+h_get_x = @get_x_cubic12;
+
 %%
 st = load( fullfile(dir_data, 'info.mat') );
 names = st.imgNames(st.imgSetId==1); % 1 indicates training data

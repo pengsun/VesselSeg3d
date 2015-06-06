@@ -7,13 +7,21 @@ if ( nargin==0 )
 %   batch_sz = 512;
 %   dir_mo = fullfile(dir_root, 'mo_zoo', 'slice48c3_cen2');
   
-  ep = 381 : 100 : 981;
+  ep = 16 : 100 : 2316;
   batch_sz = 128;
   dir_mo = fullfile(dir_root, 'mo_zoo', 'net3d2_nh16');
+  fn_data = fullfile(dir_root, 'data_cache','te_cubic32.mat');
+
+%   ep = 1036 : 100 : 2536;
+%   batch_sz = 128;
+%   dir_mo = fullfile(dir_root, 'mo_zoo', 'net3d3_nh16');
+%   fn_data = fullfile(dir_root, 'data_cache','te_cubic12.mat');
   
   %fn_data = fullfile('C:\Temp\slices2.mat');
   %fn_data = fullfile(dir_root, 'data_cache','te_slice48c3_cen2.mat');
-  fn_data = fullfile(dir_root, 'data_cache','te_cubic32.mat');
+  %fn_data = fullfile(dir_root, 'data_cache','te_cubic32.mat');
+  
+  
   fn_mo_tmpl = 'ep_%d.mat';
 elseif ( nargin==5 )
   ep = varargin{1};

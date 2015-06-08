@@ -6,12 +6,14 @@ T         = 36;  % T epoches, T == #te
 dir_data = 'D:\data\defactoSeg2';
 
 sz      = [12,12,12];
-fnout   = 'te_cubic12.mat'; % te data file name
+fnout   = 'te_cubic12_g27s5.mat'; % te data file name
 h_get_x = @get_x_cubic12;   % handle to how to get X 
+h_get_y = @get_y_g27s5;     % handle to how to get y
 
 % sz      = [48,48,3];
 % fnout   = 'te_slice48c3.mat'; % te data file name
 % h_get_x = @get_x_slice48c3;   % handle to how to get X 
+% h_get_y = @get_y_cen1;
 
 % sz      = [48,48,15];
 % fnout   = 'te_slice48c15.mat'; % te data file name
@@ -25,10 +27,10 @@ names = cellfun( @(nm)(fullfile(dir_data, nm)), ...
   names, 'UniformOutput', false); 
 
 te_bdg = bdg_mhaDefacto2(names, ni_perMha, bs, ...
-  h_get_x, @get_y_cen1, @bdg_mhaSampBal);
+  h_get_x, h_get_y, @bdg_mhaSampBal);
 %% collect data
 X = zeros([sz(1),sz(2),sz(3),0], 'single');
-Y = zeros([1, 0], 'single');
+Y = zeros([0, 1], 'single');
 
 diary( [fnout,'.txt'] );
 diary on;
@@ -39,7 +41,11 @@ for t = 1 : T
     
     data = get_bd_orig(te_bdg, i_bat);
     X = cat(4, X, data{1});
-    Y = cat(2, Y, data{2});
+    if ( isempty(Y) )
+      Y = data{2};
+    else
+      Y = cat(2, Y, data{2});
+    end
     
     assert( size(X,4)==size(Y,2) );
     fprintf('t = %d, i_bat = %d, #instances = %d\n',...

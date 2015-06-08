@@ -1,4 +1,4 @@
-% config
+%% config
 opt = {};
 % opt{end+1} = '-g';
 % opt{end+1} = '-DVB';
@@ -17,6 +17,7 @@ switch str(1:3)
     error('unsupported platform %s\n', str);
 end
 %% do it
+mex(opt{:}, 'get_y_g27s5.cpp');
 mex(opt{:}, 'get_x_cubic12.cpp');
 mex(opt{:}, 'get_x_cubic32.cpp');
 mex(opt{:}, 'get_x_slice32c3.cpp');

@@ -4,20 +4,28 @@ function err =  te_oneImg(varargin)
 % te_oneImg(fn_mo, dir_name, h_get_x, h_get_y, dir_out_s); as function
 
 if (nargin==0) % config (as script)
-  batch_sz = 1024;
+  
   dir_mo = 'D:\CodeWork\git\VesselSeg3d\mo_zoo';
-  fn_mo = fullfile(dir_mo, '\slice48c3_cen2\ep_9601.mat');
-  % instances, labels...
+  name_mo = 'net3d31_nh16';
+  cnt_mo = 'ep_2281';
+  fn_mo = fullfile(dir_mo, name_mo, [cnt_mo,'.mat']);
+  % handles
+  hgetx = @get_x_cubic12;
+  hgety = @get_y_cen1;
+  
+  % 
+  batch_sz = 1024;
+  % testing image (instances), ground truth(labels)
   name     = '01-001-MAP';
   dir_name = fullfile('D:\data\defactoSeg2\', name);
   fn_mha   = fullfile(dir_name, 't.mha');          % the CT volume
   fn_fgbg  = fullfile(dir_name, 'maskfgbg.mha');   % the fg bg mask
-  % handles
-  hgetx = @get_x_slice48c3;
-  hgety = @get_y_cen2;
+
   % output file name
-  fn_out_s  = fullfile('.\', [name,'_pre_s.mha']);
-else
+  dir_out_s = fullfile('.\', name_mo, cnt_mo);
+  if (~exist(dir_out_s,'dir')), mkdir(dir_out_s); end 
+  fn_out_s  = fullfile(dir_out_s, [name,'_pre_s.mha']);
+else % TODO: need fixing
   batch_sz = 1024;
   fn_mo = varargin{1};
   % instances, labels...

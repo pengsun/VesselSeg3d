@@ -11,9 +11,14 @@ if (nargin == 0)
   fn_bg    = fullfile(dir_name, 'maskb.mha');    % the back-ground
   fn_pre   = [name,'_pre_s.mha'];                % prediction score
   
+%   dir_pre  = './';
+%   name_mo  = 'net3d31_nh16';
+%   cnt_mo   = 'ep_2281';
+  
   dir_pre  = './';
-  name_mo  = 'net3d31_nh16';
+  name_mo  = 'net3d4_nh16';
   cnt_mo   = 'ep_2281';
+  
   fn_pre = fullfile(dir_pre, name_mo, cnt_mo, fn_pre);
 elseif (nargin == 2) % TODO: fixing
   fn_fg    = fullfile(dir_name, 'maskv3.mha');   % the fore-ground
@@ -40,7 +45,9 @@ end
 %
 figure;
 plot(fpr, tpr);
-
+set(gca, 'xlim',[0,0.07], 'ylim',[0.6,1])
+grid on;
+title([name_mo, '-', cnt_mo]);
 
 function [ss, gt] = get_ss_and_gt(pre_s, fg,bg)
 % ss: [M]. prediction scores

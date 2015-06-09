@@ -4,3 +4,7 @@
 *.mha
 *.pdb
 *.txt
+/rst_zoo/*.fig
+/*.fig
+/script_te_oneImg/*.fig
+/script/net3d4/*.fig

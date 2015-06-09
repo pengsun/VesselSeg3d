@@ -37,17 +37,17 @@ void mexFunction(int no, mxArray       *vo[],
   #pragma omp parallel for
   for (int64_T m = 0; m < M; ++m) {
     // get the center point
-    mwSize ixcen = int( *(p_ind + m) );
+    mwSize ixcen = mwSize( *(p_ind + m) );
     mwSize pntcen[3];
     ix_to_pnt3d(sz_mk, ixcen, pntcen);
 
     // destination starting point
     float *pp = p_yy + m*K; 
 
-    // manually set the K (=27) points
-    for (int i = 0; i < 2; ++i) {
-      for (int j = 0; j < 2; ++j) {
-        for (int k = 0; k < 2; ++k) {
+    // manually set the K (=num*num*num) points
+    for (int i = 0; i < num; ++i) {
+      for (int j = 0; j < num; ++j) {
+        for (int k = 0; k < num; ++k) {
           // the working offset
           int d[3]; 
           d[0] = TMPL[i]; d[1] = TMPL[j]; d[2] = TMPL[k];

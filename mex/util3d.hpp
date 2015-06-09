@@ -89,4 +89,19 @@ inline void get_val_from_offset(val_in_T *p_img, const mwSize sz_img[], mwSize p
   val =  val_out_T( *(p_img + ix) );
 }
 
+template<typename val_in_T, typename val_out_T>
+inline void acc_val_from_offset(val_in_T *p_img, const mwSize sz_img[], mwSize pntcen[], int offset[],
+                                val_out_T val)
+{
+  mwSize pnt[3];
+  cen_plus_offset(pntcen, offset, pnt);
+  clap(sz_img, pnt);
+
+  mwSize ix;
+  pnt3d_to_ix(sz_img, pnt, ix);
+
+  p_img[ix] += val_in_T( val );
+}
+
+
 #endif // util3d_h__

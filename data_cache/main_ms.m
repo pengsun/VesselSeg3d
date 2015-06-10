@@ -11,9 +11,13 @@ TT        = 200 * 1;
 % sz      = [48,48,3];
 % h_get_x = @get_x_slice48c3;
 
-fnout = 'cubic12_ms.mat';
-sz      = [12,12,12];
-h_get_x = @get_x_cubic12;
+% fnout = 'cubic12_ms.mat';
+% sz      = [12,12,12];
+% h_get_x = @get_x_cubic12;
+
+fnout = 'cubic24_ms.mat';
+sz      = [24,24,24];
+h_get_x = @get_x_cubic24;
 
 %%
 st = load( fullfile(dir_data, 'info.mat') );

@@ -20,6 +20,7 @@ end
 mex(opt{:}, 'acc_y_g27s5.cpp');
 mex(opt{:}, 'get_y_g27s5.cpp');
 mex(opt{:}, 'get_x_cubic12.cpp');
+mex(opt{:}, 'get_x_cubic24.cpp');
 mex(opt{:}, 'get_x_cubic32.cpp');
 mex(opt{:}, 'get_x_slice32c3.cpp');
 mex(opt{:}, 'get_x_slice32c15.cpp');

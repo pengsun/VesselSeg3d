@@ -5,10 +5,15 @@ T         = 36;  % T epoches, T == #te
 
 dir_data = 'D:\data\defactoSeg2';
 
-sz      = [12,12,12];
-fnout   = 'te_cubic12_g27s5.mat'; % te data file name
-h_get_x = @get_x_cubic12;   % handle to how to get X 
-h_get_y = @get_y_g27s5;     % handle to how to get y
+sz      = [24,24,24];
+fnout   = 'te_cubic24.mat'; % te data file name
+h_get_x = @get_x_cubic24;   % handle to how to get X 
+h_get_y = @get_y_cen1;     % handle to how to get y
+
+% sz      = [12,12,12];
+% fnout   = 'te_cubic12_g27s5.mat'; % te data file name
+% h_get_x = @get_x_cubic12;   % handle to how to get X 
+% h_get_y = @get_y_g27s5;     % handle to how to get y
 
 % sz      = [48,48,3];
 % fnout   = 'te_slice48c3.mat'; % te data file name

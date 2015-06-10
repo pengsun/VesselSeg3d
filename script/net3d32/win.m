@@ -1,17 +1,18 @@
-function win_tmp ()
+function win ()
 %% use asynchronous mha loader
 %% init dag: from scratch
+rng(42,'twister'); % ensure repeatability
 beg_epoch = 1; 
 dir_data  = 'D:\data\defactoSeg2';
 dir_root  = rootdir();
-dir_mo    = fullfile(dir_root,'mo_zoo','tmp3_net3d5_nh16');
+dir_mo    = fullfile(dir_root,'mo_zoo','net3d32_nh16');
 
 h = create_dag_from_scratch ();
 h = set_dataNormLayer (h, dir_root);
 %% config
 h.beg_epoch = beg_epoch;
 h.num_epoch = 200 * 30;
-batch_sz    = 32;
+batch_sz    = 256;
 ni_perMha   = 2e4;
 
 %% CPU or GPU
@@ -38,7 +39,7 @@ diary off;
 
 function h = create_dag_from_scratch ()
 h = dag_mb();
-h.the_dag = tfw_net3d5();
+h.the_dag = tfw_net3d32();
 h = set_options(h);
 h = init_params(h);
 h = init_opt(h);
@@ -46,16 +47,14 @@ h = init_opt(h);
 function h = set_options (h)
 h = set_options_mp (h, 2);
 h = set_options_mp (h, 3);
-h = set_options_mp (h, 4);
-h = set_options_mp (h, 5);
 
 function h = set_options_mp (h, ell)
 % conv: padding, keep size
 h.the_dag.tfs{ell}.tfs{1}.pad = [1,1, 1,1, 1,1];
 h.the_dag.tfs{ell}.tfs{1}.stride = [1,1,1];
-% max pool: stride 1, size-2
-h.the_dag.tfs{ell}.tfs{3}.pool = [3,3,3];
-h.the_dag.tfs{ell}.tfs{3}.stride = [1,1,1];
+% max pool: stride = pool = 2
+h.the_dag.tfs{ell}.tfs{3}.pool = [2,2,2];
+h.the_dag.tfs{ell}.tfs{3}.stride = [2,2,2];
 
 function h = init_params(h)
 NH = 16; % #hidden units
@@ -67,18 +66,12 @@ h.the_dag.p(2).a = zeros(1, NH, 'single');          % bias
 % parameter layer II, conv
 h.the_dag.p(3).a = f*randn(3,3,3, NH,NH, 'single'); 
 h.the_dag.p(4).a = zeros(1,NH,'single');
-% parameter layer III, conv
-h.the_dag.p(5).a = f*randn(3,3,3, NH,NH, 'single'); 
-h.the_dag.p(6).a = zeros(1,NH,'single');
-% parameter layer IV, conv
-h.the_dag.p(7).a = f*randn(3,3,3, NH,NH, 'single'); 
-h.the_dag.p(8).a = zeros(1,NH,'single');
-% parameter layer V, conv 1x1x1
-h.the_dag.p(9).a = f*randn(1,1,1, NH,NH/2, 'single'); 
-h.the_dag.p(10).a = zeros(1,NH/2,'single'); 
+% parameter layer V, fc
+h.the_dag.p(5).a = f*randn(3,3,3, NH, 256, 'single'); 
+h.the_dag.p(6).a = zeros(1, 256,'single'); 
 % parameter layer VI, output (full connection)
-h.the_dag.p(11).a = f*randn(4,4,4, NH/2,no, 'single'); 
-h.the_dag.p(12).a = zeros(1,no,'single'); 
+h.the_dag.p(7).a = f*randn(1,1,1, 256,no, 'single'); 
+h.the_dag.p(8).a = zeros(1,no,'single'); 
 
 function h = init_opt(h)
 num_params = numel(h.the_dag.p);
@@ -87,7 +80,7 @@ h.opt_arr(num_params) = opt_1storder();
 
 nr = floor(num_params/2);
 assert( nr == ceil(num_params/2) );
-rr = 0.001 * ones(1, nr);
+rr = 0.01 * ones(1, nr);
 for i = 1 : numel(rr)
   h.opt_arr( 2*(i-1) + 1 ).eta = rr(i);
   h.opt_arr( 2*(i-1) + 2 ).eta = rr(i);

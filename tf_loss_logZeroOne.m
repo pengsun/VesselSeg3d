@@ -25,7 +25,7 @@ classdef tf_loss_logZeroOne < tf_i
       ob.prob = 1./( 1 + exp(-2*F) ); % [1, N]
       
       % loss
-      ob.o.a = -log( y.*ob.prob + (1-y).*(1-ob.prob) );
+      ob.o.a = -log( eps + y.*ob.prob + (1-y).*(1-ob.prob) );
     end
     
     function ob = bprop (ob)

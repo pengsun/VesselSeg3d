@@ -19,9 +19,13 @@ if (nargin == 0)
 %   name_mo  = 'net3d4_nh16';
 %   cnt_mo   = 'ep_2281';
   
+%   dir_pre  = './';
+%   name_mo  = 'net3d51_nh16';
+%   cnt_mo   = 'ep_741';
+
   dir_pre  = './';
-  name_mo  = 'net3d51_nh16';
-  cnt_mo   = 'ep_559';
+  name_mo  = 'net3d6_nh16';
+  cnt_mo   = 'ep_1141';
   
   fn_pre = fullfile(dir_pre, name_mo, cnt_mo, fn_pre);
 elseif (nargin == 2) % TODO: fixing

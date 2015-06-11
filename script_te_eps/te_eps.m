@@ -4,10 +4,10 @@ function [err_ep, err] =  te_eps(varargin)
 dir_root = fileparts( fileparts( mfilename('fullpath') ) );
 if ( nargin==0 )
   
-  ep = 1 : 20 : 1646;
-  batch_sz = 700;
-  dir_mo = fullfile(dir_root, 'mo_zoo', 'net3d5_nh16');
-  fn_data = fullfile(dir_root, 'data_cache','te_cubic12.mat');  
+  ep = 1 : 20 : 1318;
+  batch_sz = 128;
+  dir_mo = fullfile(dir_root, 'mo_zoo', 'net3d6_nh16');
+  fn_data = fullfile(dir_root, 'data_cache','te_cubic24.mat');  
   
 %   ep = [381 : 100 : 981, 1081 : 200 : 2536];
 %   batch_sz = 1024;

@@ -20,12 +20,16 @@ if (nargin == 0)
 %   cnt_mo   = 'ep_2281';
   
 %   dir_pre  = './';
-%   name_mo  = 'net3d51_nh16';
-%   cnt_mo   = 'ep_741';
+%   name_mo  = 'net3d7_nh16';
+%   cnt_mo   = 'ep_4964';
 
   dir_pre  = './';
-  name_mo  = 'net3d6_nh16';
-  cnt_mo   = 'ep_1141';
+  name_mo  = 'FrangiFilter';
+  cnt_mo   = '';
+
+%   dir_pre  = './';
+%   name_mo  = 'net3d6_nh16';
+%   cnt_mo   = 'ep_1141';
   
   fn_pre = fullfile(dir_pre, name_mo, cnt_mo, fn_pre);
 elseif (nargin == 2) % TODO: fixing

@@ -6,15 +6,15 @@ function err =  te_oneImg(varargin)
 if (nargin==0) % config (as script)
   
   dir_mo = 'D:\CodeWork\git\VesselSeg3d\mo_zoo';
-  name_mo = 'net3d6_nh16';
-  cnt_mo = 'ep_1141';
+  name_mo = 'net3d7_nh16';
+  cnt_mo = 'ep_4964';
   fn_mo = fullfile(dir_mo, name_mo, [cnt_mo,'.mat']);
   % handles
-  hgetx = @get_x_cubic24;
+  hgetx = @get_x_cubic12;
   hgety = @get_y_cen1;
   
   % 
-  batch_sz = 256;
+  batch_sz = 512;
   % testing image (instances), ground truth(labels)
   name     = '01-001-MAP';
   dir_name = fullfile('D:\data\defactoSeg2\', name);

@@ -1,14 +1,16 @@
-classdef tfw_net3d7 < tfw_i
-  %TFW_NET3D7 3D ConvNet for segmentation, v7, 5 parameter layers
+classdef tfw_net3d8 < tfw_i
+  %TFW_NET3D8 3D ConvNet for segmentation, v8
   %   Taking volume patch as input, outputing the foreground scalar score
-  %   The second last layer is full connection, instead of 1x1x1 conv
+  %   The second last layer is full connection
+  %   No padding for conv, just one maxpooling layer (pool = 2). 
+  %   Prepare for the "full convolution" in testing time.
   
   properties
   end
   
   methods 
     
-    function ob = tfw_net3d7()
+    function ob = tfw_net3d8()
     % Initialize the DAG net connection
     
       %%% set the connection structure
@@ -22,9 +24,9 @@ classdef tfw_net3d7 < tfw_i
       tfs{ell}   = tfw_Conv3dReluX2Pool3d();
       tfs{ell}.i = tfs{ell-1}.o;
 
-      % -- layer II: conv3d, relu, conv3d, relu, pool3d
+      % -- layer II: conv3d, relu, conv3d, relu
       ell = ell + 1;
-      tfs{ell}   = tfw_Conv3dReluX2Pool3d();
+      tfs{ell}   = tfw_Conv3dReluX2();
       tfs{ell}.i = tfs{ell-1}.o;
             
       % -- layer III, fc, relu, dropout
